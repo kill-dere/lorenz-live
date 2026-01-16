@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lorenz 1963 - Kíldere</title>
+  <title>Efeito Borboleta - Kíldere</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
   <style>
     body { margin: 0; padding: 0; overflow: hidden; background: #000; color: white; font-family: Arial, sans-serif; }
@@ -12,7 +12,7 @@
       top: 10px; 
       left: 10px; 
       pointer-events: none; 
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.5);
       padding: 10px;
       border-radius: 8px;
     }
@@ -24,23 +24,23 @@
 </head>
 <body>
   <div id="info">
-    <h1>Lorenz Original (1963)</h1>
-    <p>Antônio Kíldere - Eng. Comp. UFC</p>
+    <h1>ATRATOR DE LORENZ-FETTER (1963)</h1>
+    <p>Antônio Kíldere Sousa Menezes - Eng. Comp. UFC</p>
     <div class="legend"><span class="dot" style="background:#00FFFF"></span> Início A</div>
     <div class="legend"><span class="dot" style="background:#FF00FF"></span> Início A + 0.0001</div>
-    <p style="margin-top:8px; color: #aaa;"><i>Rho = 28 (Clássico)</i></p>
+    <p style="margin-top:8px; color: #aaa;"><i>Arraste para girar em 3D</i></p>
   </div>
 
   <script>
     // Variáveis do Sistema 1 (Azul)
     let x1 = 0.1, y1 = 0, z1 = 0;
     
-    // Variáveis do Sistema 2 (Rosa) - Mudança minúscula
+    // Variáveis do Sistema 2 (Rosa) - Mudança minúscula no X
     let x2 = 0.1001, y2 = 0, z2 = 0;
 
-    // --- PARÂMETROS ORIGINAIS DE LORENZ (1963) ---
+    // Parâmetros de Lorenz
     let sigma = 10;
-    let rho = 28;       // O valor clássico
+    let rho = 28;
     let beta = 8.0 / 3.0;
 
     let points1 = [];
@@ -52,12 +52,10 @@
 
     function draw() {
       background(0);
-      orbitControl(); 
-      
-      // AJUSTE DE ESCALA: Como Rho=28 é menor, aumentamos o zoom para 5
-      scale(5); 
+      orbitControl(); // Permite interação 3D
+      scale(5); // Aumenta o tamanho do gráfico
 
-      let dt = 0.012; 
+      let dt = 0.015; // Passo de tempo (ligeiramente mais rápido)
 
       // --- CÁLCULO SISTEMA 1 ---
       let dx1 = (sigma * (y1 - x1)) * dt;
@@ -71,18 +69,20 @@
       let dz2 = (x2 * y2 - beta * z2) * dt;
       x2 += dx2; y2 += dy2; z2 += dz2;
 
+      // Salva os pontos
       points1.push(createVector(x1, y1, z1));
       points2.push(createVector(x2, y2, z2));
 
-      if (points1.length > 3000) {
+      // Limita a memória (mantém os últimos 2500 pontos)
+      if (points1.length > 2500) {
         points1.shift();
         points2.shift();
       }
 
       // --- DESENHO SISTEMA 1 (CIANO) ---
       noFill();
-      stroke(0, 255, 255); 
-      strokeWeight(1.2);
+      stroke(0, 255, 255); // Ciano Neon
+      strokeWeight(1.5);
       beginShape();
       for (let v of points1) {
         vertex(v.x, v.y, v.z);
@@ -90,17 +90,24 @@
       endShape();
 
       // --- DESENHO SISTEMA 2 (MAGENTA) ---
-      stroke(255, 0, 255); 
-      strokeWeight(1.2);
+      stroke(255, 0, 255); // Magenta Neon
+      strokeWeight(1.5);
       beginShape();
       for (let v of points2) {
         vertex(v.x, v.y, v.z);
       }
       endShape();
       
-      // Esferas das pontas
-      push(); translate(x1, y1, z1); noStroke(); fill(0, 255, 255); sphere(1.5); pop();
-      push(); translate(x2, y2, z2); noStroke(); fill(255, 0, 255); sphere(1.5); pop();
+      // Desenha as "cabeças" das linhas (onde estão os pontos agora)
+      push();
+      translate(x1, y1, z1);
+      noStroke(); fill(0, 255, 255); sphere(1);
+      pop();
+
+      push();
+      translate(x2, y2, z2);
+      noStroke(); fill(255, 0, 255); sphere(1);
+      pop();
     }
 
     function windowResized() {
